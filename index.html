@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ఉచిత మ్యాట్రిమోనీ పోర్టల్</title>
+  
+  <style>
+    :root {
+      --primary: #d81b60;
+      --primary-dark: #ad1457;
+      --bg: #f8f9fa;
+      --text: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Form Styles */
+    .form-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      height: fit-content;
+    }
+
+    .form-card h2 {
+      margin-bottom: 1rem;
+      color: var(--primary);
+      font-size: 1.3rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Profiles List Styles */
+    .profiles-section h2 {
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-top: 4px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background-color: #eee;
+    }
+
+    .profile-info {
+      padding: 1rem;
+      flex-grow: 1;
+    }
+
+    .profile-name {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-meta {
+      color: #666;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .profile-details p {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .contact-badge {
+      display: inline-block;
+      margin-top: 0.8rem;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      width: 100%;
+      text-align: center;
+    }
+  </style>
+
+  <!-- Firebase App & Firestore SDKs (v8 standard compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>సంబంధాల వేదిక (Matrimony Portal)</h1>
+    <p>మీకు తగిన జీవిత భాగస్వామిని సులభంగా ఎంచుకోండి</p>
+  </header>
+
+  <div class="container">
+    <!-- Left: Profile Registration Form -->
+    <div class="form-card">
+      <h2>కొత్త ప్రొఫైల్ నమోదు</h2>
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="name">పూర్తి పేరు:</label>
+          <input type="text" id="name" required placeholder="ఉదా: సురేష్ శర్మ">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">లింగం (Gender):</label>
+          <select id="gender" required>
+            <option value="">ఎంచుకోండి</option>
+            <option value="వరుడు (Groom)">వరుడు (Groom)</option>
+            <option value="వధువు (Bride)">వధువు (Bride)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="age">వయస్సు (Age):</label>
+          <input type="number" id="age" min="18" max="70" required placeholder="26">
+        </div>
+
+        <div class="form-group">
+          <label for="education">విద్యార్హత (Education):</label>
+          <input type="text" id="education" required placeholder="ఉదా: B.Tech, MBA">
+        </div>
+
+        <div class="form-group">
+          <label for="profession">ఉద్యోగం / వ్యాపారం:</label>
+          <input type="text" id="profession" required placeholder="ఉదా: సాఫ్ట్‌వేర్ ఇంజనీర్">
+        </div>
+
+        <div class="form-group">
+          <label for="city">ప్రాంతం (City / District):</label>
+          <input type="text" id="city" required placeholder="ఉదా: హైదరాబాద్, సంగారెడ్డి">
+        </div>
+
+        <div class="form-group">
+          <label for="contact">సంప్రదించాల్సిన నంబర్:</label>
+          <input type="tel" id="contact" required placeholder="ఉదా: 9876543210">
+        </div>
+
+        <div class="form-group">
+          <label for="photoUrl">ఫోటో లింక్ (Image URL):</label>
+          <input type="url" id="photoUrl" placeholder="https://example.com/photo.jpg">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">ప్రొఫైల్ సేవ్ చేయండి</button>
+      </form>
+    </div>
+
+    <!-- Right: Profiles List -->
+    <div class="profiles-section">
+      <h2>తాజా ప్రొఫైల్స్</h2>
+      <div class="profiles-grid" id="profilesContainer">
+        <!-- Live profiles will be rendered here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. మీ Firebase Console నుండి లభించే కాన్ఫిగరేషన్ వివరాలను ఇక్కడ చేర్చండి
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Firebase ప్రారంభించండి
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const profileForm = document.getElementById('profileForm');
+    const profilesContainer = document.getElementById('profilesContainer');
+
+    // 2. కొత్త ప్రొఫైల్ Firestore కు యాడ్ చేయడం
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const newProfile = {
+        name: document.getElementById('name').value.trim(),
+        gender: document.getElementById('gender').value,
+        age: Number(document.getElementById('age').value),
+        education: document.getElementById('education').value.trim(),
+        profession: document.getElementById('profession').value.trim(),
+        city: document.getElementById('city').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        photoUrl: document.getElementById('photoUrl').value.trim() || 'https://via.placeholder.com/260x200?text=No+Photo',
+        createdAt: new Date()
+      };
+
+      try {
+        await db.collection('matrimony_profiles').add(newProfile);
+        alert('ప్రొఫైల్ విజయవంతంగా సేవ్ చేయబడింది!');
+        profileForm.reset();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert('లోపం సంభవించింది: ' + error.message);
+      }
+    });
+
+    // 3. Firestore నుండి రియల్‌టైమ్ ప్రొఫైల్స్ రీడ్ చేసి చూపించడం
+    db.collection('matrimony_profiles')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((snapshot) => {
+        profilesContainer.innerHTML = '';
+
+        if (snapshot.empty) {
+          profilesContainer.innerHTML = '<p>ఇంకా ఎలాంటి ప్రొఫైల్స్ నమోదు కాలేదు.</p>';
+          return;
+        }
+
+        snapshot.forEach((doc) => {
+          const p = doc.data();
+          const card = document.createElement('div');
+          card.className = 'profile-card';
+
+          card.innerHTML = `
+            <img src="${p.photoUrl}" alt="${p.name}" class="profile-img" onerror="this.src='https://via.placeholder.com/260x200?text=No+Photo'">
+            <div class="profile-info">
+              <div class="profile-name">${p.name}</div>
+              <div class="profile-meta">${p.gender} • ${p.age} సం||</div>
+              <div class="profile-details">
+                <p><strong>విద్య:</strong> ${p.education}</p>
+                <p><strong>ఉద్యోగం:</strong> ${p.profession}</p>
+                <p><strong>ఊరు:</strong> ${p.city}</p>
+              </div>
+              <div class="contact-badge">ఫోన్: ${p.contact}</div>
+            </div>
+          `;
+          profilesContainer.appendChild(card);
+        });
+      }, (error) => {
+        console.error("Error fetching documents: ", error);
+      });
+  </script>
+</body>
+</html>
